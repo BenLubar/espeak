@@ -216,8 +216,13 @@ func synthCallback(cwav *C.short, numsamples C.int, cevents *C.espeak_EVENT) C.i
 	}
 
 	var events []Event
-	for C.eventType(cevents) != C.espeakEVENT_LIST_TERMINATED {
+	for {
 		events = append(events, parseEvent(cevents))
+
+		if C.eventType(cevents) == C.espeakEVENT_LIST_TERMINATED {
+			break
+		}
+
 		cevents = (*C.espeak_EVENT)(unsafe.Pointer(uintptr(unsafe.Pointer(cevents)) + unsafe.Sizeof(*cevents)))
 
 		// playback modes don't get multiple events per call.
@@ -251,6 +256,7 @@ func parseEvent(cevent *C.espeak_EVENT) Event {
 		TextPosition:     int(cevent.text_position),
 		Length:           int(cevent.length),
 		AudioPosition:    int(cevent.audio_position),
+		Sample:           int(cevent.sample),
 		UserData:         data,
 	}
 	switch C.eventType(cevent) {
@@ -287,6 +293,14 @@ func parseEvent(cevent *C.espeak_EVENT) Event {
 			BaseEvent: base,
 			String:    C.GoString(C.eventString(cevent)),
 		}
+	case C.espeakEVENT_SAMPLERATE:
+		return SampleRateEvent{
+			BaseEvent: base,
+		}
+	case C.espeakEVENT_LIST_TERMINATED:
+		return ListTerminatedEvent{
+			BaseEvent: base,
+		}
 	default:
 		panic(fmt.Sprintf("espeak: unexpected event type %d", C.eventType(cevent)))
 	}
@@ -302,6 +316,7 @@ type (
 		TextPosition     int
 		Length           int
 		AudioPosition    int
+		Sample           int
 		UserData         interface{}
 	}
 
@@ -337,6 +352,14 @@ type (
 	PhonemeEvent struct {
 		BaseEvent
 		String string
+	}
+	// Set sample rate
+	SampleRateEvent struct {
+		BaseEvent
+	}
+	// Retrieval mode: terminates the event list.
+	ListTerminatedEvent struct {
+		BaseEvent
 	}
 )
 
@@ -433,7 +456,7 @@ func ListVoices() []*Voice {
 
 // Reads the voice files from espeak-data/voices and creates a slice of
 // *espeak.Voice. Matching voices are listed in preference order.
-func ListVoicesByProperties(name, language string, gender Gender, age uint8, variant int) []*Voice {
+func ListVoicesByProperties(name, language string, gender Gender, age uint8) []*Voice {
 	var cname, clanguage *C.char
 	if name != "" {
 		cname = C.CString(name)
@@ -448,7 +471,6 @@ func ListVoicesByProperties(name, language string, gender Gender, age uint8, var
 		languages: clanguage,
 		gender:    C.uchar(gender),
 		age:       C.uchar(age),
-		variant:   C.uchar(variant),
 	}
 
 	var voices []*Voice

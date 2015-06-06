@@ -54,7 +54,7 @@ type userData struct {
 	buf  buffer
 }
 
-func Synth(w io.Writer, voice *espeak.Voice, text string) error {
+func Synth(w io.Writer, voice *espeak.Voice, text string, pitch, pitchRange, rate int) error {
 	lock.Lock()
 
 	if voice != nil {
@@ -69,6 +69,16 @@ func Synth(w io.Writer, voice *espeak.Voice, text string) error {
 
 	if err := startWav(&data.buf, sampleRate); err != nil {
 		lock.Unlock()
+		return err
+	}
+
+	if err := espeak.SetPitch(pitch); err != nil {
+		return err
+	}
+	if err := espeak.SetRange(pitchRange); err != nil {
+		return err
+	}
+	if err := espeak.SetRate(rate); err != nil {
 		return err
 	}
 

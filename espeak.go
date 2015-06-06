@@ -174,7 +174,7 @@ func Synth(text string, position uint, positionType PositionType, endPosition, f
 		cuserData = unsafe.Pointer(ptr)
 	}
 	cflags := C.uint(flags)&^7 | C.espeakCHARS_UTF8
-	csize := C.size_t(len(text))
+	csize := C.size_t(len(text) + 1)
 	ctext := unsafe.Pointer(C.CString(text))
 	defer C.free(ctext)
 

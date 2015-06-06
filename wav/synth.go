@@ -21,14 +21,14 @@ func init() {
 
 	espeak.SetSynthCallback(func(wav []int16, events []espeak.Event) (stop bool) {
 		data := events[len(events)-1].(espeak.ListTerminatedEvent).UserData.(*userData)
-		if wav == nil {
-			data.done <- nil
-			return false
-		}
 
 		if err := binary.Write(&data.buf, binary.LittleEndian, wav); err != nil {
 			data.done <- err
 			return true
+		}
+
+		if _, ok := events[0].(espeak.MsgTerminatedEvent); ok {
+			data.done <- nil
 		}
 
 		return false
@@ -73,12 +73,15 @@ func Synth(w io.Writer, voice *espeak.Voice, text string, pitch, pitchRange, rat
 	}
 
 	if err := espeak.SetPitch(pitch); err != nil {
+		lock.Unlock()
 		return err
 	}
 	if err := espeak.SetRange(pitchRange); err != nil {
+		lock.Unlock()
 		return err
 	}
 	if err := espeak.SetRate(rate); err != nil {
+		lock.Unlock()
 		return err
 	}
 

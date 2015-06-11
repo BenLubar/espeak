@@ -71,21 +71,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	var voice *espeak.Voice
 	if len(voices) != 0 {
 		voice = voices[0]
+	} else {
+		http.Error(w, "invalid voice", http.StatusBadRequest)
 	}
 
 	pitch, err := strconv.Atoi(r.FormValue("pitch"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err != nil || pitch < 0 || pitch > 100 {
+		http.Error(w, "invalid pitch", http.StatusBadRequest)
 		return
 	}
 	pitchRange, err := strconv.Atoi(r.FormValue("range"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err != nil || pitchRange < 0 || pitchRange > 100 {
+		http.Error(w, "invalid range", http.StatusBadRequest)
 		return
 	}
 	rate, err := strconv.Atoi(r.FormValue("rate"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err != nil || rate < 80 || rate > 450 {
+		http.Error(w, "invalid rate", http.StatusBadRequest)
 		return
 	}
 

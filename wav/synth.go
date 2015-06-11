@@ -2,11 +2,15 @@ package wav
 
 import (
 	"encoding/binary"
+	"errors"
 	"io"
 	"sync"
+	"time"
 
 	"github.com/BenLubar/espeak"
 )
+
+var ErrTimeout = errors.New("wav: timeout")
 
 var lock sync.Mutex
 
@@ -56,10 +60,10 @@ type userData struct {
 
 func Synth(w io.Writer, voice *espeak.Voice, text string, pitch, pitchRange, rate int) error {
 	lock.Lock()
+	defer lock.Unlock()
 
 	if voice != nil {
 		if err := espeak.SetVoiceByName(voice.Name); err != nil {
-			lock.Unlock()
 			return err
 		}
 	}
@@ -68,31 +72,35 @@ func Synth(w io.Writer, voice *espeak.Voice, text string, pitch, pitchRange, rat
 	data.done = make(chan error, 1)
 
 	if err := startWav(&data.buf, sampleRate); err != nil {
-		lock.Unlock()
 		return err
 	}
 
 	if err := espeak.SetPitch(pitch); err != nil {
-		lock.Unlock()
 		return err
 	}
 	if err := espeak.SetRange(pitchRange); err != nil {
-		lock.Unlock()
 		return err
 	}
 	if err := espeak.SetRate(rate); err != nil {
-		lock.Unlock()
 		return err
 	}
 
 	if err := espeak.Synth(text, 0, espeak.PosCharacter, 0, 0, nil, &data); err != nil {
-		lock.Unlock()
 		return err
 	}
-	lock.Unlock()
 
-	if err := <-data.done; err != nil {
-		return err
+	select {
+	case err := <-data.done:
+		if err != nil {
+			return err
+		}
+
+	case <-time.After(time.Second):
+		if err := espeak.Cancel(); err != nil {
+			return err
+		}
+
+		return ErrTimeout
 	}
 
 	if err := finishWav(&data.buf); err != nil {

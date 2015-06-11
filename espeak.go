@@ -551,3 +551,11 @@ func Range() int {
 func SetRange(percent int) error {
 	return espeakError(C.espeak_SetParameter(C.espeakRANGE, C.int(percent), 0))
 }
+
+func Synchronize() error {
+	return espeakError(C.espeak_Synchronize())
+}
+
+func Cancel() error {
+	return espeakError(C.espeak_Cancel())
+}

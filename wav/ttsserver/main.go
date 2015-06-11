@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/tts", handler)
 
 	if err := http.ListenAndServe(":8050", nil); err != nil {
 		panic(err)
@@ -23,7 +23,7 @@ var tmpl = template.Must(template.New("tts").Parse(`<!DOCTYPE html>
 <title>Text to Speech</title>
 </head>
 <body>
-<form action="/" method="get">
+<form action="/tts" method="get">
 <textarea id="text" name="text">{{.Req.FormValue "text"}}</textarea><br>
 <label for="voice">Voice:</label>
 <select id="voice" name="voice">
@@ -41,13 +41,13 @@ var tmpl = template.Must(template.New("tts").Parse(`<!DOCTYPE html>
 <input type="range" id="rate" name="rate" value="{{or (.Req.FormValue "rate") "175"}}" min="80" max="450"><br>
 <input type="submit" value="Text to Speech">
 </form>
-{{if .Req.FormValue "text"}}<audio src="/?voice={{or (.Req.FormValue "voice") "default"}}&amp;text={{.Req.FormValue "text"}}&amp;pitch={{or (.Req.FormValue "pitch") 50}}&amp;range={{or (.Req.FormValue "range") 50}}&amp;rate={{or (.Req.FormValue "rate") 175}}&amp;tts=1" type="audio/wav" autoplay controls></audio>{{end}}
+{{if .Req.FormValue "text"}}<audio src="/tts?voice={{or (.Req.FormValue "voice") "default"}}&amp;text={{.Req.FormValue "text"}}&amp;pitch={{or (.Req.FormValue "pitch") 50}}&amp;range={{or (.Req.FormValue "range") 50}}&amp;rate={{or (.Req.FormValue "rate") 175}}&amp;tts=1" type="audio/wav" autoplay controls></audio>{{end}}
 </body>
 </html>
 `))
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/tts" {
 		http.NotFound(w, r)
 		return
 	}

@@ -559,3 +559,36 @@ func Synchronize() error {
 func Cancel() error {
 	return espeakError(C.espeak_Cancel())
 }
+
+type PhonemeMode int
+
+const (
+	PhonemeOnly       PhonemeMode = 0 // just phonemes
+	PhonemeTies       PhonemeMode = 1 // include ties (U+0361) for multi-letter names
+	PhonemeZWJ        PhonemeMode = 2 // include zero-width joiners for phoneme names of more than one letter
+	PhonemeUnderscore PhonemeMode = 3 // separate phonemes with underscore characters
+)
+
+// TextToPhonemes translates text into phonemes.  Call SetVoiceByName() first,
+// to select a language.
+//
+// It returns a string which contains the phonemes for the text up to
+// end of a sentence, or comma, semicolon, colon, or similar punctuation,
+// as well as a string containing the remaining characters.
+func TextToPhonemes(text string, phonemeMode PhonemeMode, ipa bool) (phonemes, remaining string) {
+	cText := C.CString(text)
+	defer C.free(unsafe.Pointer(cText))
+
+	cRemaining := unsafe.Pointer(cText)
+
+	if ipa {
+		phonemeMode |= 1 << 4
+	}
+
+	cPhonemes := C.espeak_TextToPhonemes(&cRemaining, C.espeakCHARS_UTF8, C.int(phonemeMode))
+	phonemes = C.GoString(cPhonemes)
+	if cRemaining != nil {
+		remaining = C.GoString((*C.char)(cRemaining))
+	}
+	return
+}

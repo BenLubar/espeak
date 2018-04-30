@@ -55,3 +55,8 @@ emcc -o ../../libespeak-ng.inc.js \
 	-Oz
 
 echo 'this.ESpeakNG = ESpeakNG;' >> ../../libespeak-ng.inc.js
+
+cd ../..
+echo '// +build js' > js_defs.gen.go
+GOARCH=386 go tool cgo -godefs js_defs.go >> js_defs.gen.go
+rm -rf _obj

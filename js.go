@@ -34,14 +34,6 @@ func setU8(ptr uintptr, val uint8) {
 	module.Call("setValue", ptr, val, "i8")
 }
 
-func setI16(ptr uintptr, val int16) {
-	module.Call("setValue", ptr, val, "i16")
-}
-
-func setI32(ptr uintptr, val int) {
-	module.Call("setValue", ptr, val, "i32")
-}
-
 func malloc(size uintptr) uintptr {
 	return uintptr(module.Call("_malloc", size).Int())
 }

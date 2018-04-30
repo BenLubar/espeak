@@ -1,5 +1,4 @@
 //go:generate build/make_js.bash
-//go:generate bash -ec "echo '// +build js' > js_defs.gen.go && GOARCH=386 go tool cgo -godefs js_defs.go >> js_defs.gen.go && rm -rf _obj"
 
 package espeak // import "gopkg.in/BenLubar/espeak.v2"
 
@@ -27,8 +26,6 @@ type Context struct {
 	Samples []int16
 	Events  []*SynthEvent
 
-	isInit bool
-
 	rate   int // words per minute, 80 to 450; default 175
 	volume int // percentage of normal volume, min 0; default 100
 	pitch  int // base pitch, 0 to 100; default 50
@@ -44,6 +41,8 @@ type Context struct {
 		age      uint8
 		variant  uint8
 	}
+
+	isInit bool
 }
 
 func (ctx *Context) init() {

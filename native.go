@@ -216,7 +216,8 @@ var synthCtx *Context
 
 //export synthCallback
 func synthCallback(wav *C.short, numsamples C.int, events *C.espeak_EVENT) C.int {
-	for i, pwav := C.int(0), uintptr(unsafe.Pointer(wav)); i < numsamples; i, pwav = i+1, pwav+unsafe.Sizeof(C.short(0)) {
+	for i := C.int(0); i < numsamples; i++ {
+		pwav := uintptr(unsafe.Pointer(wav)) + uintptr(i)*unsafe.Sizeof(C.short(0))
 		synthCtx.Samples = append(synthCtx.Samples, int16(*(*C.short)(unsafe.Pointer(pwav))))
 	}
 

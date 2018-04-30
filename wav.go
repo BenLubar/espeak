@@ -6,6 +6,7 @@ import (
 	"io"
 )
 
+// WriteTo writes the Samples in this Context to an io.Writer in WAV format.
 func (ctx *Context) WriteTo(w io.Writer) (int64, error) {
 	check32 := func(n int) int32 {
 		if n < 0 {

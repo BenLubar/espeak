@@ -1,4 +1,4 @@
-package wav
+package wav // import "gopkg.in/BenLubar/espeak.v1/wav"
 
 import (
 	"encoding/binary"

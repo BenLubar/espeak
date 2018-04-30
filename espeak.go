@@ -3,7 +3,7 @@
 // Please note that functions in this package should only be called from one
 // goroutine at a time as libespeak uses static variables for most of its
 // returned values.
-package espeak
+package espeak // import "gopkg.in/BenLubar/espeak.v1"
 
 /*
 #cgo LDFLAGS: -lespeak

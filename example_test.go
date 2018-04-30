@@ -6,7 +6,7 @@ import (
 	"gopkg.in/BenLubar/espeak.v2"
 )
 
-func ExampleSSML() {
+func Example_ssml() {
 	const ssml = `<?xml version="1.0"?>
 <speak version="1.1"
 	xmlns="http://www.w3.org/2001/10/synthesis"

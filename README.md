@@ -12,7 +12,7 @@ go get -u gopkg.in/BenLubar/espeak.v2
 
 ## Looking for an older version?
 
-The original implementation of this package from 2015 is still available at [`gopkg.in/BenLubar/espeak.v2`](https://gopkg.in/BenLubar/espeak.v2).
+The original implementation of this package from 2015 is still available at [`gopkg.in/BenLubar/espeak.v1`](https://gopkg.in/BenLubar/espeak.v1).
 
 ## Special thanks
 

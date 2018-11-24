@@ -140,9 +140,9 @@ func listVoices() []*Voice {
 
 func toVoice(cVoice uintptr) *Voice {
 	return &Voice{
-		Name:       toString(cVoice + voiceNameOffset),
-		Languages:  toLanguages(cVoice + voiceLanguagesOffset),
-		Identifier: toString(cVoice + voiceIdentifierOffset),
+		Name:       toString(deref(cVoice + voiceNameOffset)),
+		Languages:  toLanguages(deref(cVoice + voiceLanguagesOffset)),
+		Identifier: toString(deref(cVoice + voiceIdentifierOffset)),
 		Gender:     Gender(getU8(cVoice + voiceGenderOffset)),
 		Age:        getU8(cVoice + voiceAgeOffset),
 	}

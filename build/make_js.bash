@@ -42,12 +42,14 @@ emcc -o ../../libespeak-ng.inc.js \
 		"_espeak_ng_SetParameter",
 		"_espeak_ng_SetVoiceByName",
 		"_espeak_ng_SetVoiceByProperties",
-		"_espeak_ng_Synthesize"
+		"_espeak_ng_Synthesize",
+		"_espeak_ListVoices"
 	]' \
 	-s RESERVED_FUNCTION_POINTERS=1 \
 	-s EXTRA_EXPORTED_RUNTIME_METHODS='["addFunction","getValue","setValue"]' \
 	-s LZ4=1 \
 	-s EXPORT_NAME='"ESpeakNG"' \
+	-s WASM=0 \
 	--embed-file espeak-ng-data@/usr/share/espeak-ng-data \
 	--exclude-file espeak-ng-data/mbrola_ph \
 	--exclude-file espeak-ng-data/phondata-manifest \
